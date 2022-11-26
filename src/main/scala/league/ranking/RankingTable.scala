@@ -41,7 +41,7 @@ object RankingTable extends App {
   catch {
     case e: FileNotFoundException => println("Couldn't find that file: " + e)
     case e: IOException => println("Got an IOException: " + e)
-    case e: Exception => println("Exception occured: " + e)
+    case e: Exception => println("Exception occurred: " + e)
   }
 
 }

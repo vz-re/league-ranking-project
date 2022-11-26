@@ -1,5 +1,6 @@
 import league.ranking.MatchInfo
 import league.ranking.ProcessFunctions._
+import league.ranking.config.Configuration._
 import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable
 
@@ -19,10 +20,16 @@ class RankingTableTestSpec extends AnyFunSuite {
     assert(getMatchInfo(Vector("AB A 3", "CE FR TR 3")) === MatchInfo("AB A", 3, "CE FR TR", 3))
   }
 
-  test("updateRankingMap function should create and update a Map with stipulated points") {
+  test("updateRankingMap function should create and update a Map according to stipulated rules") {
     val createMap = updateRankingMap(mutable.HashMap.empty[String, Int], "A", 3, "B", 0)
     assert(createMap === mutable.HashMap("A" -> 3, "B" -> 0))
     assert(updateRankingMap(createMap, "C", 1, "B", 1) === mutable.HashMap("A" -> 3, "B" -> 1, "C" -> 1))
+  }
+
+  test("getResult function should assign points to each team based on their final game score") {
+    assert(getResult(2, 2) === (DRAW_POINTS, DRAW_POINTS))
+    assert(getResult(3, 1) === (WIN_POINTS, LOSE_POINTS))
+    assert(getResult(2, 6) === (LOSE_POINTS, WIN_POINTS))
   }
 
   test("evaluateMatch function should evaluate each match and update the Map using updateRankingMap") {
@@ -39,7 +46,7 @@ class RankingTableTestSpec extends AnyFunSuite {
     assert(convertAndSort(rankingMap) !== Vector(("BC", 0), ("CD", 1), ("EF", 1), ("AB", 3), ("DE", 4)))
   }
 
-  test("constructOutput function should shape the string format for the ranking table") {
+  test("constructOutput function should shape the output for the ranking table") {
     assert(constructOutput(sortedRankings) === Vector("1. DE, 4 pts", "2. AB, 3 pts", "3. CD, 1 pt", "4. EF, 1 pt", "5. BC, 0 pts"))
     assert(constructOutput(sortedRankings) !== Vector("1. DE, 4 pts", "2. AB, 3 pts", "3. CD, 1 pts", "4. EF, 1 pts", "5. BC, 0 pts"))
   }

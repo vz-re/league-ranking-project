@@ -1,5 +1,6 @@
 package league.ranking
 
+import league.ranking.config.Configuration._
 import java.io.{BufferedWriter, File, FileWriter}
 import scala.collection.mutable
 
@@ -11,8 +12,8 @@ object ProcessFunctions {
 
   def getMatchInfo(teamsInfo: Vector[String]): MatchInfo = {
     val split = teamsInfo.map(ti => {
-      val spl = ti.split("\\s(?=\\S*$)")
-      (spl(0).trim, spl(1).toInt)
+      val pair = ti.split("\\s(?=\\S*$)")
+      (pair(0).trim, pair(1).toInt)
     })
     MatchInfo(split.head._1, split.head._2, split.last._1, split.last._2)
   }
@@ -23,10 +24,16 @@ object ProcessFunctions {
   }
 
   def evaluateMatch(map: mutable.HashMap[String, Int], matchInfo: MatchInfo): map.type = {
-    (matchInfo.team1Score, matchInfo.team2Score) match {
-      case (a, b) if a > b => updateRankingMap(map, matchInfo.team1, 3, matchInfo.team2, 0)
-      case (a, b) if a < b => updateRankingMap(map, matchInfo.team2, 3, matchInfo.team1, 0)
-      case (a, b) if a == b => updateRankingMap(map, matchInfo.team1, 1, matchInfo.team2, 1)
+    val (team1Points, team2Points) = getResult(matchInfo.team1Score, matchInfo.team2Score)
+    updateRankingMap(map, matchInfo.team1, team1Points, matchInfo.team2, team2Points)
+  }
+
+  def getResult(team1Score: Int, team2Score: Int): (Int, Int) = {
+    val res = team1Score - team2Score
+    res match {
+      case x if x > 0 => (WIN_POINTS, LOSE_POINTS)
+      case x if x < 0 => (LOSE_POINTS, WIN_POINTS)
+      case x if x == 0 => (DRAW_POINTS, DRAW_POINTS)
     }
   }
 
@@ -43,7 +50,7 @@ object ProcessFunctions {
           case 1 => "pt"
           case _ => "pts"
         }
-        (serialPrefix + 1, s"${serialPrefix.toString}. ${team._1}, ${team._2} $suffix" +: acc)
+        (serialPrefix + 1, s"$serialPrefix. ${team._1}, ${team._2} $suffix" +: acc)
     }._2.reverse
   }
 
