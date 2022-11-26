@@ -5,25 +5,25 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable
 
 class RankingTableTestSpec extends AnyFunSuite {
-  val inputLine: String = "A 3,B 3"
   val teamsInfo: Vector[String] = Vector("A 3", "B 3")
-  val matchInfo: MatchInfo = MatchInfo("A", 3, "B", 3)
 
   test("splitLineEntry function should separate strings based on a comma") {
-    assert(splitLineEntry(inputLine) === teamsInfo)
+    assert(splitLineEntry("A 3,B 3") === teamsInfo)
     assert(splitLineEntry("A 3;B 3") !== teamsInfo)
     assert(splitLineEntry("A 3 B 3") !== teamsInfo)
   }
 
   test("getMatchInfo function should separate strings at last whitespace and save result in a MatchInfo case class") {
-    assert(getMatchInfo(teamsInfo) === matchInfo)
+    assert(getMatchInfo(teamsInfo) === MatchInfo("A", 3, "B", 3))
     assert(getMatchInfo(Vector("AB A 3", "CE FR TR 3")) === MatchInfo("AB A", 3, "CE FR TR", 3))
   }
 
   test("updateRankingMap function should create and update a Map according to stipulated rules") {
     val createMap = updateRankingMap(mutable.HashMap.empty[String, Int], "A", 3, "B", 0)
     assert(createMap === mutable.HashMap("A" -> 3, "B" -> 0))
-    assert(updateRankingMap(createMap, "C", 1, "B", 1) === mutable.HashMap("A" -> 3, "B" -> 1, "C" -> 1))
+
+    val updateMap = updateRankingMap(createMap, "C", 1, "B", 1)
+    assert(updateMap === mutable.HashMap("A" -> 3, "B" -> 1, "C" -> 1))
   }
 
   test("getResult function should assign points to each team based on their final game score") {
@@ -33,8 +33,8 @@ class RankingTableTestSpec extends AnyFunSuite {
   }
 
   test("evaluateMatch function should evaluate each match and update the Map using updateRankingMap") {
-    assert(evaluateMatch(mutable.HashMap("A" -> 3, "B" -> 0), MatchInfo("E", 3, "C", 3)) ===
-      mutable.HashMap("A" -> 3, "B" -> 0, "C" -> 1, "E" -> 1))
+    val rankingMap = mutable.HashMap.empty[String, Int]
+    assert(evaluateMatch(rankingMap, MatchInfo("E", 3, "C", 3)) === mutable.HashMap("C" -> 1, "E" -> 1))
   }
 
   val rankingMap: mutable.HashMap[String, Int] = mutable.HashMap("AB" -> 3, "CD" -> 1, "BC" -> 0, "EF" -> 1, "DE" -> 4)
