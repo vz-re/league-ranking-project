@@ -5,7 +5,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable
 
 class RankingTableTestSpec extends AnyFunSuite {
-  val teamsInfo: Vector[String] = Vector("A 3", "B 3")
+  val teamsInfo: Array[String] = Array("A 3", "B 3")
 
   test("splitLineEntry function should separate strings based on a comma") {
     assert(splitLineEntry("A 3,B 3") === teamsInfo)
@@ -15,7 +15,7 @@ class RankingTableTestSpec extends AnyFunSuite {
 
   test("getMatchInfo function should separate strings at last whitespace and save result in a MatchInfo case class") {
     assert(getMatchInfo(teamsInfo) === MatchInfo("A", 3, "B", 3))
-    assert(getMatchInfo(Vector("AB A 3", "CE FR TR 3")) === MatchInfo("AB A", 3, "CE FR TR", 3))
+    assert(getMatchInfo(Array("AB A 3", "CE FR TR 3")) === MatchInfo("AB A", 3, "CE FR TR", 3))
   }
 
   test("updateRankingMap function should create and update a Map according to stipulated rules") {
@@ -32,7 +32,7 @@ class RankingTableTestSpec extends AnyFunSuite {
     assert(getResult(2, 6) === (LOSE_POINTS, WIN_POINTS))
   }
 
-  test("evaluateMatch function should evaluate each match and update the Map using updateRankingMap") {
+  test("evaluateMatch function should evaluate each match  with getResult and update the Map using updateRankingMap") {
     val rankingMap = mutable.HashMap.empty[String, Int]
     assert(evaluateMatch(rankingMap, MatchInfo("E", 3, "C", 3)) === mutable.HashMap("C" -> 1, "E" -> 1))
   }
@@ -43,7 +43,7 @@ class RankingTableTestSpec extends AnyFunSuite {
   test("convertAndSort function should convert the Map to a Vector and sort it in descending order then alphabetically") {
     assert(convertAndSort(rankingMap) === sortedRankings)
     assert(convertAndSort(rankingMap) !== Vector(("DE", 4), ("AB", 3), ("EF", 1), ("CD", 1), ("BC", 0)))
-    assert(convertAndSort(rankingMap) !== Vector(("BC", 0), ("CD", 1), ("EF", 1), ("AB", 3), ("DE", 4)))
+    assert(convertAndSort(rankingMap) !== Vector(("BC", 0), ("CD", 1), ("EF", 2), ("AB", 3), ("DE", 4)))
   }
 
   test("constructOutput function should shape the output for the ranking table") {

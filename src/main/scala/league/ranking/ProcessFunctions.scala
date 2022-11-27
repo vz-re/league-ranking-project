@@ -6,11 +6,11 @@ import scala.collection.mutable
 
 object ProcessFunctions {
 
-  def splitLineEntry(line: String): Vector[String] = {
-    line.split(",").toVector
+  def splitLineEntry(line: String): Array[String] = {
+    line.split(",")
   }
 
-  def getMatchInfo(teamsInfo: Vector[String]): MatchInfo = {
+  def getMatchInfo(teamsInfo: Array[String]): MatchInfo = {
     val split = teamsInfo.map(ti => {
       val pair = ti.split("\\s(?=\\S*$)")
       (pair(0).trim, pair(1).toInt)
